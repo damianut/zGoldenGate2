@@ -11,32 +11,6 @@ namespace GOTHIC_ENGINE {
   }
   
   void Game_Init() {
-      const CPlugin* myPlugin = CPlugin::GetCurrentPlugin();
-
-      CStringA gothicVersion;
-      switch (Union.GetEngineVersion()) {
-      case Engine_G1:
-          gothicVersion = "Gothic I";
-          break;
-      case Engine_G1A:
-          gothicVersion = "Gothic Sequel";
-          break;
-      case Engine_G2:
-          gothicVersion = "Gothic II";
-          break;
-      case Engine_G2A:
-          gothicVersion = "Gothic II NoTR";
-          break;
-      default:
-          gothicVersion = "Not possible case. Engine version doesn't match any known engine.";
-          break;
-      }
-
-      CStringA message = "Plugin: " + myPlugin->GetName() + "\n";
-      message = message + "Union Version: " + Union.GetUnionVersion().ToString() + "\n";
-      message = message + "Gothic Version: " + gothicVersion;
-
-      Message::Info(message, "Hello World");
   }
 
   void Game_Exit() {
