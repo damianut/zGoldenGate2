@@ -3,3 +3,4 @@
 // User API for oCAIArrow
 // Add your methods here
 
+int CanThisCollideWith_Union( zCVob* );

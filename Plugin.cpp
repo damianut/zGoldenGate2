@@ -3,14 +3,39 @@
 #include "resource.h"
 
 namespace GOTHIC_ENGINE {
+  
+  // Not collide with a oCTriggerScript
+  HOOK Hook_oCAIArrow_CanThisCollideWith PATCH_IF(&oCAIArrow::CanThisCollideWith, &oCAIArrow::CanThisCollideWith_Union, false);
+  
+  int oCAIArrow::CanThisCollideWith_Union(zCVob* vob) {
+ 
+      // Not collide with a oCTriggerScript with a one exception defined below
+      zCClassDef* classDef = vob->_GetClassDef();
+      if (classDef->className == "oCTriggerScript") {
 
-  // TO DO
-  // Your code ...
+          // Check whether this trigger should react on shooting
+          zCTrigger* trigger = static_cast<zCTrigger*>(vob);
+
+          if (trigger->respondToVobName != "SHOTTOTRIGGER")
+          {
+              return 0;
+          };
+      }
+
+      int originalValue = THISCALL(Hook_oCAIArrow_CanThisCollideWith)(vob);
+
+      return originalValue;
+  }
+
+  void EnableHook() {
+      Hook_oCAIArrow_CanThisCollideWith.Commit();
+  }
 
   void Game_Entry() {
   }
   
   void Game_Init() {
+      EnableHook();
   }
 
   void Game_Exit() {
