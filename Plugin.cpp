@@ -27,8 +27,32 @@ namespace GOTHIC_ENGINE {
       return originalValue;
   }
 
+  // Don't finish given NPCs
+  HOOK Hook_oCNpc_EV_AttackFinish PATCH_IF(&oCNpc::EV_AttackFinish, &oCNpc::EV_AttackFinish_Union, false);
+
+  int oCNpc::EV_AttackFinish_Union(oCMsgAttack* csg) {
+
+      oCNpc* pTargetNpc = zDYNAMIC_CAST<oCNpc>(csg->target);
+
+      if (1 == pTargetNpc->aiscriptvars[2]) {
+          cmd << "Hehe";
+
+          if (this->IsSelfPlayer()) {
+              cmd << "Hoho";
+              this->GetModel()->StartAni("T_NO", 0);
+          }
+
+          return 1;
+      }
+
+      int originalValue = THISCALL(Hook_oCNpc_EV_AttackFinish)(csg);
+
+      return originalValue;
+  }
+
   void EnableHook() {
       Hook_oCAIArrow_CanThisCollideWith.Commit();
+      Hook_oCNpc_EV_AttackFinish.Commit();
   }
 
   void Game_Entry() {
