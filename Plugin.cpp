@@ -16,10 +16,10 @@ namespace GOTHIC_ENGINE {
           // Check whether this trigger should react on shooting
           zCTrigger* trigger = static_cast<zCTrigger*>(vob);
 
-          if (trigger->respondToVobName != "SHOTTOTRIGGER")
+          if (!trigger->filterFlags.respondToObject)
           {
               return 0;
-          };
+          }
       }
 
       int originalValue = THISCALL(Hook_oCAIArrow_CanThisCollideWith)(vob);
