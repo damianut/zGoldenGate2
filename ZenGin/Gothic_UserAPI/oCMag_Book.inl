@@ -3,3 +3,4 @@
 // User API for oCMag_Book
 // Add your methods here
 
+void Spell_Cast_Union( );

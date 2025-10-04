@@ -27,8 +27,37 @@ namespace GOTHIC_ENGINE {
       return originalValue;
   }
 
+  // Add additional damage to the hero spell
+  HOOK Hook_oCMag_Book_Spell_Cast PATCH_IF(&oCMag_Book::Spell_Cast, &oCMag_Book::Spell_Cast_Union, false);
+
+  void oCMag_Book::Spell_Cast_Union() {
+
+      // Get spell
+      oCSpell* spell = GetSelectedSpell();
+
+      // Get caster
+      oCNpc* npc = spell->spellCasterNpc;
+
+      // If is player
+      if (npc->IsAPlayer()) {
+          int ManaSpellForce = 0;
+          zCPar_Symbol* sym = parser->GetSymbol("ManaSpellForce");
+          if (sym) sym->GetValue(ManaSpellForce, 0);
+
+          if (0 != ManaSpellForce)
+          {
+              oCVisualFX* effectCurrent = spell->effect;
+              effectCurrent->damage = effectCurrent->damage + float(ManaSpellForce);
+          }
+      }
+
+      THISCALL(Hook_oCMag_Book_Spell_Cast)();
+  }
+
+
   void EnableHook() {
       Hook_oCAIArrow_CanThisCollideWith.Commit();
+      Hook_oCMag_Book_Spell_Cast.Commit();
   }
 
   void Game_Entry() {
