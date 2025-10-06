@@ -132,8 +132,25 @@ namespace GOTHIC_ENGINE {
   
   void Game_Unpause() {
   }
+
+  // Get an item which C_NPC uses to cast a spell
+  int Npc_GetActiveSpellSourceItem() {
+      oCNpc* instance = (oCNpc*)parser->GetInstance();
+      if (instance) {
+          if (instance->GetWeaponMode() == NPC_WEAPON_MAG) {
+              oCMag_Book* book = instance->GetSpellBook();
+              if (book) {
+                  oCItem* item = book->GetSpellItem(book->GetSelectedSpellNr());
+                  parser->SetInstance("ITEM", item);
+              }
+          }
+      }
+
+      return true;
+  }
   
   void Game_DefineExternals() {
+      parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
   }
 
   void Game_ApplyOptions() {
