@@ -148,9 +148,43 @@ namespace GOTHIC_ENGINE {
 
       return true;
   }
+
+  // Display achievement
+  int DisplayAchievement() {
+      // Name of the thumbnail to display
+      zSTRING thumbnailName;
+
+      // Save the provided string
+      parser->GetParameter(thumbnailName);
+
+      // Return, if empty
+      if (thumbnailName.IsEmpty()) return false;
+
+      // Create zCView
+      zCView* view = zNEW(zCView(0, 0, 8192, 8192));
+      screen->InsertItem(view);
+
+      // Add background
+      view->InsertBack(thumbnailName);
+
+      // Change position and size
+      int dx = screen->anx(100);
+      int dy = screen->any(100);
+
+      view->SetPos(300, 300);
+      view->SetSize(dx, dy);
+
+      // Display
+      view->Blit();
+
+      // Remove view
+      // screen->RemoveItem(view);
+      // delete view; view = 0;
+  }
   
   void Game_DefineExternals() {
       parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
+      parser->DefineExternal("DisplayAchievement", DisplayAchievement, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_VOID);
   }
 
   void Game_ApplyOptions() {
