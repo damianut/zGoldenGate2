@@ -3,3 +3,4 @@
 // User API for CGameManager
 // Add your methods here
 
+int MenuEnabled_Union( zBOOL& );

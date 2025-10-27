@@ -54,10 +54,25 @@ namespace GOTHIC_ENGINE {
       THISCALL(Hook_oCMag_Book_Spell_Cast)();
   }
 
+  // Disable saving
+  HOOK Hook_CGameManager_MenuEnabled PATCH_IF(&CGameManager::MenuEnabled, &CGameManager::MenuEnabled_Union, false);
+
+  int CGameManager::MenuEnabled_Union(zBOOL& enableSave) {
+      int SAVINGDISABLED = 0;
+      zCPar_Symbol* sym = parser->GetSymbol("SAVINGDISABLED");
+      if (sym) sym->GetValue(SAVINGDISABLED, 0);
+
+      int enabled = THISCALL(Hook_CGameManager_MenuEnabled)(enableSave);
+      if (1 == SAVINGDISABLED)
+          enableSave = false;
+
+      return enabled;
+  }
 
   void EnableHook() {
       Hook_oCAIArrow_CanThisCollideWith.Commit();
       Hook_oCMag_Book_Spell_Cast.Commit();
+      Hook_CGameManager_MenuEnabled.Commit();
   }
 
   void Game_Entry() {
