@@ -3,3 +3,4 @@
 // User API for oCNpc
 // Add your methods here
 
+int EV_AttackForward_Union( oCMsgAttack* );

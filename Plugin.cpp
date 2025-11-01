@@ -69,10 +69,55 @@ namespace GOTHIC_ENGINE {
       return enabled;
   }
 
+  // Restore combos
+  HOOK Hook_oCNpc_EV_AttackForward PATCH_IF(&oCNpc::EV_AttackForward, &oCNpc::EV_AttackForward_Union, false);
+
+  int oCNpc::EV_AttackForward_Union(oCMsgAttack* csg) {
+      // For NPCs only
+      if (IsSelfPlayer())
+      {
+          int returned = THISCALL(Hook_oCNpc_EV_AttackForward)(csg);
+
+          return returned;
+      };
+
+      // If doesn't have to do a combo for sure (I don't understand this condition, I restore it)
+      if (!csg->IsInUse() && (csg->hitAni != -1))
+      {
+          int returned = THISCALL(Hook_oCNpc_EV_AttackForward)(csg);
+
+          return returned;
+      };
+
+      
+
+      // If doesn't have to do a combo for sure (I don't understand this condition, I restore it)
+      if (csg->combo == -1)
+      {
+          int returned = THISCALL(Hook_oCNpc_EV_AttackForward)(csg);
+
+          return returned;
+
+      // Fixed comparison: `<` to `>`
+      } else if ((csg->combo - 1) > anictrl->comboNr)
+      {
+          anictrl->HitCombo(TRUE);
+
+          if (anictrl->comboNr + 1 < anictrl->comboMax) {
+              anictrl->canEnableNextCombo = 1;
+          }
+      }
+      
+      int returned = THISCALL(Hook_oCNpc_EV_AttackForward)(csg);
+
+      return returned;
+  }
+
   void EnableHook() {
       Hook_oCAIArrow_CanThisCollideWith.Commit();
       Hook_oCMag_Book_Spell_Cast.Commit();
       Hook_CGameManager_MenuEnabled.Commit();
+      Hook_oCNpc_EV_AttackForward.Commit();
   }
 
   void Game_Entry() {
