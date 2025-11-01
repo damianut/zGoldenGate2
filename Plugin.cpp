@@ -113,11 +113,90 @@ namespace GOTHIC_ENGINE {
       return returned;
   }
 
+  // New FAI Move: MOVE_TRIPLEFRONTATTACK
+  HOOK Hook_oCNpc_ThinkNextFightAction PATCH_IF(&oCNpc::ThinkNextFightAction, &oCNpc::ThinkNextFightAction_Union, false);
+
+  int oCNpc::ThinkNextFightAction_Union() {
+      THISCALL(Hook_oCNpc_ThinkNextFightAction)();
+
+      int myMove = FindNextFightAction();
+
+      if (myMove == 25) {
+          switch (GetWeaponMode()) {
+
+          case NPC_WEAPON_FIST:
+          case NPC_WEAPON_DAG:
+          case NPC_WEAPON_1HS:
+          case NPC_WEAPON_2HS:	// Nahkampf
+              FightAttackMelee(myMove);
+              break;
+          case NPC_WEAPON_BOW:
+          case NPC_WEAPON_CBOW:	// Fernkampf
+              FightAttackBow();
+              break;
+          case NPC_WEAPON_MAG:	// Magie
+              FightAttackMagic();
+              break;
+
+          default:	// Ouch, this should never happen.
+              break;
+          }
+      }
+
+      return false;
+  }
+
+  HOOK Hook_oCNpc_FightAttackMelee PATCH_IF(&oCNpc::FightAttackMelee, &oCNpc::FightAttackMelee_Union, false);
+
+  int oCNpc::FightAttackMelee_Union(int myMove) {
+      if (myMove == 25) {
+          //       Left -> Right ->Left -> Forward
+          // OR    Right -> Left ->Right -> Forward ---> MOVE_TRIPLEFRONTATTACK
+          if ((rand() % 2) == 0) {
+              oCMsgAttack* att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKLEFT, anictrl->_t_hitl, -1);
+              GetEM()->OnMessage(att, this);
+
+              att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKRIGHT, anictrl->_t_hitr, -1);
+              GetEM()->OnMessage(att, this);
+
+              att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKLEFT, anictrl->_t_hitl, -1);
+              GetEM()->OnMessage(att, this);
+
+              att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKFORWARD, anictrl->_t_hitf, true);
+              GetEM()->OnMessage(att, this);
+          } else {
+              oCMsgAttack* att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKRIGHT, anictrl->_t_hitr, -1);
+              GetEM()->OnMessage(att, this);
+
+              att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKLEFT, anictrl->_t_hitl, -1);
+              GetEM()->OnMessage(att, this);
+
+              att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKRIGHT, anictrl->_t_hitr, -1);
+              GetEM()->OnMessage(att, this);
+
+              att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKFORWARD, anictrl->_t_hitf, true);
+              GetEM()->OnMessage(att, this);
+          }
+
+          
+
+          return TRUE;
+
+      } else
+      {
+          int returned = THISCALL(Hook_oCNpc_FightAttackMelee)(myMove);
+
+          return returned;
+      };
+  }
+
   void EnableHook() {
       Hook_oCAIArrow_CanThisCollideWith.Commit();
       Hook_oCMag_Book_Spell_Cast.Commit();
       Hook_CGameManager_MenuEnabled.Commit();
       Hook_oCNpc_EV_AttackForward.Commit();
+      Hook_oCNpc_FightAttackMelee.Commit();
+      Hook_oCNpc_ThinkNextFightAction.Commit();
   }
 
   void Game_Entry() {
