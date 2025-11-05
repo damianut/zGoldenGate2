@@ -121,7 +121,72 @@ namespace GOTHIC_ENGINE {
 
       int myMove = FindNextFightAction();
 
-      if (myMove == 25) {
+      if (myMove == 25)
+      {
+          switch (GetWeaponMode()) {
+
+          case NPC_WEAPON_FIST:
+          case NPC_WEAPON_DAG:
+          case NPC_WEAPON_1HS:
+          case NPC_WEAPON_2HS:	// Nahkampf
+              FightAttackMelee(myMove);
+              break;
+          case NPC_WEAPON_BOW:
+          case NPC_WEAPON_CBOW:	// Fernkampf
+              FightAttackBow();
+              break;
+          case NPC_WEAPON_MAG:	// Magie
+              FightAttackMagic();
+              break;
+
+          default:	// Ouch, this should never happen.
+              break;
+          }
+      } else if (myMove == 26)
+      {
+          switch (GetWeaponMode()) {
+
+          case NPC_WEAPON_FIST:
+          case NPC_WEAPON_DAG:
+          case NPC_WEAPON_1HS:
+          case NPC_WEAPON_2HS:	// Nahkampf
+              FightAttackMelee(myMove);
+              break;
+          case NPC_WEAPON_BOW:
+          case NPC_WEAPON_CBOW:	// Fernkampf
+              FightAttackBow();
+              break;
+          case NPC_WEAPON_MAG:	// Magie
+              FightAttackMagic();
+              break;
+
+          default:	// Ouch, this should never happen.
+              break;
+          }
+      } else if (myMove == 27)
+      {
+          switch (GetWeaponMode()) {
+
+          case NPC_WEAPON_FIST:
+          case NPC_WEAPON_DAG:
+          case NPC_WEAPON_1HS:
+          case NPC_WEAPON_2HS:	// Nahkampf
+              FightAttackMelee(myMove);
+              break;
+          case NPC_WEAPON_BOW:
+          case NPC_WEAPON_CBOW:	// Fernkampf
+              FightAttackBow();
+              break;
+          case NPC_WEAPON_MAG:	// Magie
+              FightAttackMagic();
+              break;
+
+          default:	// Ouch, this should never happen.
+              break;
+          }
+      }
+      else if (myMove == 28)
+      {
           switch (GetWeaponMode()) {
 
           case NPC_WEAPON_FIST:
@@ -149,7 +214,39 @@ namespace GOTHIC_ENGINE {
   HOOK Hook_oCNpc_FightAttackMelee PATCH_IF(&oCNpc::FightAttackMelee, &oCNpc::FightAttackMelee_Union, false);
 
   int oCNpc::FightAttackMelee_Union(int myMove) {
-      if (myMove == 25) {
+      if (myMove == 28) {
+          //       Forward --> Forward ---> MOVE_FORWARDTWO
+          oCMsgAttack* att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKFORWARD, anictrl->_t_hitf, 2);
+          GetEM()->OnMessage(att, this);
+
+          return TRUE;
+      } else if (myMove == 27) {
+          //       Forward
+          // OR    Forward --> Forward ---> MOVE_FORWARDONEORTWO
+          if ((rand() % 2) == 0) {
+              oCMsgAttack* att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKFORWARD, anictrl->_t_hitf, 2);
+              GetEM()->OnMessage(att, this);
+          }
+          else {
+              oCMsgAttack* att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKFORWARD, anictrl->_t_hitf, true);
+              GetEM()->OnMessage(att, this);
+          }
+
+          return TRUE;
+      } else if (myMove == 26) {
+          //       Forward
+          // OR    Forward --> Forward ---> MOVE_FORWARDONEORTWO_66_33
+          if ((rand() % 3) == 0) {
+              oCMsgAttack* att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKFORWARD, anictrl->_t_hitf, 2);
+              GetEM()->OnMessage(att, this);
+          }
+          else {
+              oCMsgAttack* att = zNEW(oCMsgAttack)(oCMsgAttack::EV_ATTACKFORWARD, anictrl->_t_hitf, true);
+              GetEM()->OnMessage(att, this);
+          }
+
+          return TRUE;
+      } else if (myMove == 25) {
           //       Left -> Right ->Left -> Forward
           // OR    Right -> Left ->Right -> Forward ---> MOVE_TRIPLEFRONTATTACK
           if ((rand() % 2) == 0) {
@@ -287,7 +384,7 @@ namespace GOTHIC_ENGINE {
 
       return true;
   }
-  
+
   void Game_DefineExternals() {
       parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
   }
