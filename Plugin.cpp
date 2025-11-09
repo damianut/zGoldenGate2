@@ -287,6 +287,23 @@ namespace GOTHIC_ENGINE {
       };
   }
 
+  // Not killable NPCs
+  HOOK Hook_oCNpc_OnDamage_Condition PATCH_IF(&oCNpc::OnDamage_Condition, &oCNpc::OnDamage_Condition_Union, false);
+
+  void oCNpc::OnDamage_Condition_Union(oSDamageDescriptor& descDamage) {
+
+      THISCALL(Hook_oCNpc_OnDamage_Condition)(descDamage);
+
+      // Set damage as not lethal
+      if (true == descDamage.bIsDead) {
+          if (true == this->aiscriptvars[98])
+          {
+              descDamage.bIsDead = false;
+              descDamage.bIsUnconscious = true;
+          };
+      };
+  }
+
   void EnableHook() {
       Hook_oCAIArrow_CanThisCollideWith.Commit();
       Hook_oCMag_Book_Spell_Cast.Commit();
@@ -294,6 +311,7 @@ namespace GOTHIC_ENGINE {
       Hook_oCNpc_EV_AttackForward.Commit();
       Hook_oCNpc_FightAttackMelee.Commit();
       Hook_oCNpc_ThinkNextFightAction.Commit();
+      Hook_oCNpc_OnDamage_Condition.Commit();
   }
 
   void Game_Entry() {
@@ -385,7 +403,7 @@ namespace GOTHIC_ENGINE {
       return true;
   }
 
-  void Game_DefineExternals() {
+   void Game_DefineExternals() {
       parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
   }
 

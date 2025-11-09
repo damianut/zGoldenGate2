@@ -6,3 +6,4 @@
 int EV_AttackForward_Union( oCMsgAttack* );
 int FightAttackMelee_Union( int );
 int ThinkNextFightAction_Union( );
+void OnDamage_Condition_Union( oSDamageDescriptor& );
