@@ -287,7 +287,7 @@ namespace GOTHIC_ENGINE {
       };
   }
 
-  // Not killable NPCs
+  // Not killable NPCs, if `AIV_NotKillable = 98` set to true and `AIV_DropDeadAndKill = 52` not set to true
   HOOK Hook_oCNpc_OnDamage_Condition PATCH_IF(&oCNpc::OnDamage_Condition, &oCNpc::OnDamage_Condition_Union, false);
 
   void oCNpc::OnDamage_Condition_Union(oSDamageDescriptor& descDamage) {
@@ -296,10 +296,14 @@ namespace GOTHIC_ENGINE {
 
       // Set damage as not lethal
       if (true == descDamage.bIsDead) {
-          if (true == this->aiscriptvars[98])
+          // If it is not force by `AIV_DropDeadAndKill = 52`
+          if (false == this->aiscriptvars[52])
           {
-              descDamage.bIsDead = false;
-              descDamage.bIsUnconscious = true;
+              if (true == this->aiscriptvars[98])
+              {
+                  descDamage.bIsDead = false;
+                  descDamage.bIsUnconscious = true;
+              };
           };
       };
   }
