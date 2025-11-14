@@ -407,8 +407,24 @@ namespace GOTHIC_ENGINE {
       return true;
   }
 
-   void Game_DefineExternals() {
+  // Hide player status
+  int ShowPlayerStatus() {
+      ogame->SetShowPlayerStatus(true);
+
+      return true;
+  }
+
+  // Hide player status
+  int HidePlayerStatus() {
+      ogame->SetShowPlayerStatus(false);
+
+      return true;
+  }
+
+  void Game_DefineExternals() {
       parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
+      parser->DefineExternal("HidePlayerStatus", HidePlayerStatus, zPAR_TYPE_VOID, zPAR_TYPE_VOID);
+      parser->DefineExternal("ShowPlayerStatus", ShowPlayerStatus, zPAR_TYPE_VOID, zPAR_TYPE_VOID);
   }
 
   void Game_ApplyOptions() {
