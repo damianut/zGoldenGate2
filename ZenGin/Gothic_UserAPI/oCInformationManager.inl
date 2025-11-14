@@ -3,3 +3,4 @@
 // User API for oCInformationManager
 // Add your methods here
 
+void __fastcall OnTermination_Union( );

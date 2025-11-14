@@ -308,6 +308,22 @@ namespace GOTHIC_ENGINE {
       };
   }
 
+  // Don't show player status after a dialogue
+  HOOK Hook_oCInformationManager_OnTermination PATCH_IF(&oCInformationManager::OnTermination, &oCInformationManager::OnTermination_Union, false);
+
+  void __fastcall oCInformationManager::OnTermination_Union() {
+      THISCALL(Hook_oCInformationManager_OnTermination)();
+
+      int ForceHidePlayerStatusAfterDialogue = 0;
+      zCPar_Symbol* sym = parser->GetSymbol("ForceHidePlayerStatusAfterDialogue");
+      if (sym) sym->GetValue(ForceHidePlayerStatusAfterDialogue, 0);
+
+      if (0 != ForceHidePlayerStatusAfterDialogue)
+      {
+          ogame->SetShowPlayerStatus(false);
+      };
+  }
+
   void EnableHook() {
       Hook_oCAIArrow_CanThisCollideWith.Commit();
       Hook_oCMag_Book_Spell_Cast.Commit();
@@ -316,6 +332,7 @@ namespace GOTHIC_ENGINE {
       Hook_oCNpc_FightAttackMelee.Commit();
       Hook_oCNpc_ThinkNextFightAction.Commit();
       Hook_oCNpc_OnDamage_Condition.Commit();
+      Hook_oCInformationManager_OnTermination.Commit();
   }
 
   void Game_Entry() {
@@ -407,24 +424,8 @@ namespace GOTHIC_ENGINE {
       return true;
   }
 
-  // Hide player status
-  int ShowPlayerStatus() {
-      ogame->SetShowPlayerStatus(true);
-
-      return true;
-  }
-
-  // Hide player status
-  int HidePlayerStatus() {
-      ogame->SetShowPlayerStatus(false);
-
-      return true;
-  }
-
   void Game_DefineExternals() {
       parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
-      parser->DefineExternal("HidePlayerStatus", HidePlayerStatus, zPAR_TYPE_VOID, zPAR_TYPE_VOID);
-      parser->DefineExternal("ShowPlayerStatus", ShowPlayerStatus, zPAR_TYPE_VOID, zPAR_TYPE_VOID);
   }
 
   void Game_ApplyOptions() {
