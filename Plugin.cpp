@@ -4,93 +4,123 @@
 
 namespace GOTHIC_ENGINE {
   
-    /*
-     *  Show Boss Bar
-     */
-    oCViewStatusBar* bossBar;
+  /*
+   *  Show Boss Bar
+   */
+  oCViewStatusBar* bossBar;
 
-    void BossBar_Create() {
-        // oCViewStatusBar
-        bossBar = zNEW(oCViewStatusBar());
-        screen->InsertItem(bossBar);
-        bossBar->Init(2048, 100, 1.0); // x: 1/4 of full size, y: 100/8192
-        bossBar->SetSize(4096, screen->any(25)); // x: 1/2 of full size: y: 40 px (1,5 of health bar)
-        bossBar->SetTextures("BossBar_Back.tga", "", "BAR_health.tga", "");
-        bossBar->SetMaxRange(0, 30); // Default, to change while update
+  void BossBar_Create() {
+      // oCViewStatusBar
+      bossBar = zNEW(oCViewStatusBar());
+      screen->InsertItem(bossBar);
+      bossBar->Init(2048, 100, 1.0); // x: 1/4 of full size, y: 100/8192
+      bossBar->SetSize(4096, screen->any(25)); // x: 1/2 of full size: y: 40 px (1,5 of health bar)
+      bossBar->SetTextures("BossBar_Back.tga", "", "BAR_health.tga", "");
+      bossBar->SetMaxRange(0, 30); // Default, to change while update
 
-        screen->RemoveItem(bossBar);
-    }
+      screen->RemoveItem(bossBar);
+  }
 
-    void BossBar_Update() {
-        screen->InsertItem(bossBar);
+  void BossBar_Update() {
+      screen->InsertItem(bossBar);
 
-        // HP
-        int BossBar_HP = 0;
-        zCPar_Symbol* sym = parser->GetSymbol("BossBar_HP");
-        if (sym) sym->GetValue(BossBar_HP, 0);
+      // HP
+      int BossBar_HP = 0;
+      zCPar_Symbol* sym = parser->GetSymbol("BossBar_HP");
+      if (sym) sym->GetValue(BossBar_HP, 0);
 
-        // HPMax
-        int BossBar_HPMax = 0;
-        sym = parser->GetSymbol("BossBar_HPMax");
-        if (sym) sym->GetValue(BossBar_HPMax, 0);
+      // HPMax
+      int BossBar_HPMax = 0;
+      sym = parser->GetSymbol("BossBar_HPMax");
+      if (sym) sym->GetValue(BossBar_HPMax, 0);
 
-        bossBar->SetMaxRange(0, (float)BossBar_HPMax);
-        bossBar->SetRange(0, (float)BossBar_HPMax);
-        bossBar->SetPreview((float)BossBar_HP);
-        bossBar->SetValue((float)BossBar_HP);
-    }
+      bossBar->SetMaxRange(0, (float)BossBar_HPMax);
+      bossBar->SetRange(0, (float)BossBar_HPMax);
+      bossBar->SetPreview((float)BossBar_HP);
+      bossBar->SetValue((float)BossBar_HP);
+  }
 
-    void BossBar_Hide() {
-        if (bossBar) { screen->RemoveItem(bossBar); };
-    }
+  void BossBar_Hide() {
+      if (bossBar) { screen->RemoveItem(bossBar); };
+  }
 
-    void BossBar_Delete() {
-        if (bossBar) { screen->RemoveItem(bossBar); delete bossBar; bossBar = NULL; };
-    }
+  void BossBar_Delete() {
+      if (bossBar) { screen->RemoveItem(bossBar); delete bossBar; bossBar = NULL; };
+  }
 
-    void BossBar_Controller() {
-        // Show only, if player status is displayed
-        if (!ogame->GetShowPlayerStatus())
-        {
-            BossBar_Hide();
-            return;
-        };
+  void BossBar_Controller() {
+      // Show only, if player status is displayed
+      if (!ogame->GetShowPlayerStatus())
+      {
+          BossBar_Hide();
+          return;
+      };
 
-        // Show only, player hitpoints bar is created
-        if (!ogame->hpBar) {
-            BossBar_Hide();
-            return;
-        };
+      // Show only, player hitpoints bar is created
+      if (!ogame->hpBar) {
+          BossBar_Hide();
+          return;
+      };
 
-        // Show only, if desktop is not toggled
-        if (ogame->pause_screen) {
-            BossBar_Hide();
-            return;
-        };
+      // Show only, if desktop is not toggled
+      if (ogame->pause_screen) {
+          BossBar_Hide();
+          return;
+      };
 
-        // Check should be enabled
-        int BossBar_Enabled = 0;
-        zCPar_Symbol* sym = parser->GetSymbol("BossBar_Enabled");
-        if (sym) sym->GetValue(BossBar_Enabled, 0);
+      // Check should be enabled
+      int BossBar_Enabled = 0;
+      zCPar_Symbol* sym = parser->GetSymbol("BossBar_Enabled");
+      if (sym) sym->GetValue(BossBar_Enabled, 0);
 
-        if (true == BossBar_Enabled)
-        {
-            // Create, if needed
-            if (!bossBar) {
-                BossBar_Create();
-            };
+      if (true == BossBar_Enabled)
+      {
+          // Create, if needed
+          if (!bossBar) {
+              BossBar_Create();
+          };
 
-            // Update
-            BossBar_Update();
-            // Delete, if shouldn't be displayed
-        }
-        else
-        {
-            if (bossBar) {
-                BossBar_Delete();
-            };
-        };
-    }
+          // Update
+          BossBar_Update();
+          // Delete, if shouldn't be displayed
+      }
+      else
+      {
+          if (bossBar) {
+              BossBar_Delete();
+          };
+      };
+  }
+
+  /*
+   *  Stop trigger
+   */
+  void StopTrigger_Controller() {
+      // Is stopping enabled?
+      int StopTrigger_Enabled = 0;
+      zCPar_Symbol* sym = parser->GetSymbol("StopTrigger_Enabled");
+      if (sym) sym->GetValue(StopTrigger_Enabled, 0);
+      if (!StopTrigger_Enabled) {
+          return;
+      };
+
+      if (zinput->KeyToggled(KEY_E)) {
+          // Get trigger id
+          int StopTrigger_TriggerID = 0;
+          zCPar_Symbol* sym = parser->GetSymbol("StopTrigger_TriggerID");
+          if (sym) sym->GetValue(StopTrigger_TriggerID, 0);
+
+          // Get trigger name
+          zSTRING StopTrigger_TriggerName = "";
+          sym = parser->GetSymbol("StopTrigger_TriggerNames");
+          if (sym) sym->GetValue(StopTrigger_TriggerName, StopTrigger_TriggerID);
+
+          zCVob* vob = ogame->GetWorld()->SearchVobByName(StopTrigger_TriggerName);
+          if (vob) {
+              vob->GetEM()->OnUntrigger(vob, vob);
+          };
+      };
+  }
 
 
   // Not collide with a oCTriggerScript
@@ -473,6 +503,9 @@ namespace GOTHIC_ENGINE {
   void Game_Loop() {
       // Show Boss Bar
       BossBar_Controller();
+
+      // Stop trigger on demand
+      StopTrigger_Controller();
   }
 
   void Game_PostLoop() {
