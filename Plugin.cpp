@@ -348,7 +348,83 @@ namespace GOTHIC_ENGINE {
   void Game_PreLoop() {
   }
 
+  /*
+   *  Show Boss Bar
+   */
+  oCViewStatusBar* bossBar;
+
+  void BossBar_Create() {
+      // oCViewStatusBar
+      bossBar = zNEW(oCViewStatusBar());
+      screen->InsertItem(bossBar);
+      bossBar->Init(2048, 100, 1.0); // x: 1/4 of full size, y: 100/8192
+      bossBar->SetSize(4096, screen->any(30)); // x: 1/2 of full size: y: 40 px (1,5 of health bar)
+      bossBar->SetTextures("BossBar_Back.tga", "", "BAR_health.tga", "");
+      bossBar->SetMaxRange(0, 30); // Default, to change while update
+      screen->RemoveItem(bossBar);
+  }
+
+  void BossBar_Update() {
+      screen->InsertItem(bossBar);
+
+      // HP
+      int BossBar_HP = 0;
+      zCPar_Symbol* sym = parser->GetSymbol("BossBar_HP");
+      if (sym) sym->GetValue(BossBar_HP, 0);
+
+      // HPMax
+      int BossBar_HPMax = 0;
+      sym = parser->GetSymbol("BossBar_HPMax");
+      if (sym) sym->GetValue(BossBar_HPMax, 0);
+
+      bossBar->SetMaxRange(0, (float)BossBar_HPMax);
+      bossBar->SetRange(0, (float)BossBar_HPMax);
+      bossBar->SetPreview((float)BossBar_HP);
+      bossBar->SetValue((float)BossBar_HP);
+  }
+
+  void BossBar_Delete() {
+      if (bossBar) { screen->RemoveItem(bossBar); delete bossBar; bossBar = NULL; };
+  }
+
+  void BossBar_Controller() {
+      // Show only, if player status is displayed
+      if (!ogame->GetShowPlayerStatus())
+      {
+          return;
+      }
+
+      // Show only, player hitpoints bar is created
+      if (!ogame->hpBar) {
+         return;
+      };
+
+      // Check should be enabled
+      int BossBar_Enabled = 0;
+      zCPar_Symbol* sym = parser->GetSymbol("BossBar_Enabled");
+      if (sym) sym->GetValue(BossBar_Enabled, 0);
+
+      if (true == BossBar_Enabled)
+      {
+          // Create, if needed
+          if (!bossBar) {
+              BossBar_Create();
+          };
+
+          // Update
+          BossBar_Update();
+      // Delete, if shouldn't be displayed
+      } else
+      {
+          if (bossBar) {
+              BossBar_Delete();
+          };
+      };
+  }
+
   void Game_Loop() {
+      // Show Boss Bar
+      BossBar_Controller();
   }
 
   void Game_PostLoop() {
@@ -361,6 +437,8 @@ namespace GOTHIC_ENGINE {
   TSaveLoadGameInfo& SaveLoadGameInfo = UnionCore::SaveLoadGameInfo;
 
   void Game_SaveBegin() {
+      // To not save Boss Bar
+      BossBar_Delete();
   }
 
   void Game_SaveEnd() {
