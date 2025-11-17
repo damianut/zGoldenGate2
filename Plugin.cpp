@@ -493,6 +493,49 @@ namespace GOTHIC_ENGINE {
   }
   */
 
+  // Get an item which C_NPC uses to cast a spell
+  int Npc_GetActiveSpellSourceItem() {
+      oCNpc* instance = (oCNpc*)parser->GetInstance();
+      if (instance) {
+          if (instance->GetWeaponMode() == NPC_WEAPON_MAG) {
+              oCMag_Book* book = instance->GetSpellBook();
+              if (book) {
+                  oCItem* item = book->GetSpellItem(book->GetSelectedSpellNr());
+                  parser->SetInstance("ITEM", item);
+              }
+          }
+      }
+
+      return true;
+  }
+
+  int LastSndHandle = 0;
+
+  // Play SFX with returning a handle to stop it
+  int SndHandle_Play() {
+      // Get SFX name
+      zSTRING s;
+      parser->GetParameter(s);
+
+      // Get sound to play
+      zCSoundFX* snd = zsound->LoadSoundFXScript(s);
+      if (snd != NULL) {
+          LastSndHandle = zsound->PlaySound(snd, 0);
+          zRELEASE(snd);
+      };
+
+      return true;
+  }
+
+  // Stop last SFX played with SndHandle_Play
+  int SndHandle_Stop() {
+      if (0 < LastSndHandle) {
+          zsound->StopSound(LastSndHandle);
+      };
+
+      return true;
+  }
+
   void EnableHook() {
       Hook_oCAIArrow_CanThisCollideWith.Commit();
       Hook_oCMag_Book_Spell_Cast.Commit();
@@ -547,6 +590,8 @@ namespace GOTHIC_ENGINE {
   }
 
   void LoadEnd() {
+      // Reset SFX handle
+      LastSndHandle = 0;
   }
 
   void Game_LoadBegin_NewGame() {
@@ -583,49 +628,6 @@ namespace GOTHIC_ENGINE {
   }
   
   void Game_Unpause() {
-  }
-
-  // Get an item which C_NPC uses to cast a spell
-  int Npc_GetActiveSpellSourceItem() {
-      oCNpc* instance = (oCNpc*)parser->GetInstance();
-      if (instance) {
-          if (instance->GetWeaponMode() == NPC_WEAPON_MAG) {
-              oCMag_Book* book = instance->GetSpellBook();
-              if (book) {
-                  oCItem* item = book->GetSpellItem(book->GetSelectedSpellNr());
-                  parser->SetInstance("ITEM", item);
-              }
-          }
-      }
-
-      return true;
-  }
-
-  int LastSndHandle = 0;
-
-  // Play SFX with returning a handle to stop it
-  int SndHandle_Play() {
-      // Get SFX name
-      zSTRING s;
-      parser->GetParameter(s);
-
-      // Get sound to play
-      zCSoundFX* snd = zsound->LoadSoundFXScript(s);
-      if (snd != NULL) {
-          LastSndHandle = zsound->PlaySound(snd, 0);
-          zRELEASE(snd);
-      };
-
-      return true;
-  }
-
-  // Stop last SFX played with SndHandle_Play
-  int SndHandle_Stop() {
-      if (0 < LastSndHandle) {
-          zsound->StopSound(LastSndHandle);
-      };
-
-      return true;
   }
 
   void Game_DefineExternals() {
