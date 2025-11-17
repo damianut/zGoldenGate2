@@ -93,31 +93,38 @@ namespace GOTHIC_ENGINE {
   }
 
   /*
-   *  Stop trigger
+   *  Untrigger on demand
    */
-  void StopTrigger_Controller() {
-      // Is stopping enabled?
-      int StopTrigger_Enabled = 0;
-      zCPar_Symbol* sym = parser->GetSymbol("StopTrigger_Enabled");
-      if (sym) sym->GetValue(StopTrigger_Enabled, 0);
-      if (!StopTrigger_Enabled) {
+  void UntriggerOnDemand_Controller() {
+      // Is untriggering enabled?
+      int UntriggerOnDemand_Enabled = 0;
+      zCPar_Symbol* sym = parser->GetSymbol("UntriggerOnDemand_Enabled");
+      if (sym) sym->GetValue(UntriggerOnDemand_Enabled, 0);
+      if (!UntriggerOnDemand_Enabled) {
           return;
       };
 
       if (zinput->KeyToggled(KEY_E)) {
           // Get trigger id
-          int StopTrigger_TriggerID = 0;
-          zCPar_Symbol* sym = parser->GetSymbol("StopTrigger_TriggerID");
-          if (sym) sym->GetValue(StopTrigger_TriggerID, 0);
+          int UntriggerOnDemand_TriggerID = 0;
+          zCPar_Symbol* sym = parser->GetSymbol("UntriggerOnDemand_TriggerID");
+          if (sym) sym->GetValue(UntriggerOnDemand_TriggerID, 0);
 
           // Get trigger name
-          zSTRING StopTrigger_TriggerName = "";
-          sym = parser->GetSymbol("StopTrigger_TriggerNames");
-          if (sym) sym->GetValue(StopTrigger_TriggerName, StopTrigger_TriggerID);
+          zSTRING UntriggerOnDemand_TriggerNames = "";
+          sym = parser->GetSymbol("UntriggerOnDemand_TriggerNames");
+          if (sym) sym->GetValue(UntriggerOnDemand_TriggerNames, UntriggerOnDemand_TriggerID);
 
-          zCVob* vob = ogame->GetWorld()->SearchVobByName(StopTrigger_TriggerName);
+          // Untrigger
+          zCVob* vob = ogame->GetWorld()->SearchVobByName(UntriggerOnDemand_TriggerNames);
           if (vob) {
               vob->GetEM()->OnUntrigger(vob, vob);
+          };
+
+          // Call external to perform further actions
+          int extFunc = parser->GetIndex("B_UNTRIGGERONDEMAND_UNTRIGGER");
+          if (extFunc > 0) {
+              parser->CallFunc(extFunc);
           };
       };
   }
@@ -504,8 +511,8 @@ namespace GOTHIC_ENGINE {
       // Show Boss Bar
       BossBar_Controller();
 
-      // Stop trigger on demand
-      StopTrigger_Controller();
+      // Untrigger on demand
+      UntriggerOnDemand_Controller();
   }
 
   void Game_PostLoop() {
