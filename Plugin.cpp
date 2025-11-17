@@ -601,8 +601,19 @@ namespace GOTHIC_ENGINE {
       return true;
   }
 
+  // Play SFX on the last (rare used) slot to stop later
+  int StopAllSoundsExt() {
+      // Get sound to play
+      if (zsound) {
+          zsound->StopAllSounds();
+      };
+
+      return true;
+  }
+
   void Game_DefineExternals() {
       parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
+      parser->DefineExternal("StopAllSoundsExt", StopAllSoundsExt, zPAR_TYPE_VOID, zPAR_TYPE_VOID);
   }
 
   void Game_ApplyOptions() {
