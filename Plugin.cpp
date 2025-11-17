@@ -96,6 +96,17 @@ namespace GOTHIC_ENGINE {
    *  Untrigger on demand
    */
   void UntriggerOnDemand_Controller() {
+      // Untrigger only, if player status is displayed
+      if (!ogame->GetShowPlayerStatus())
+      {
+          return;
+      };
+
+      // Untrigger only, if desktop is not toggled
+      if (ogame->pause_screen) {
+          return;
+      };
+
       // Is untriggering enabled?
       int UntriggerOnDemand_Enabled = 0;
       zCPar_Symbol* sym = parser->GetSymbol("UntriggerOnDemand_Enabled");
