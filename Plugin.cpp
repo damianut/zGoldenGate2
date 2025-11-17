@@ -601,11 +601,28 @@ namespace GOTHIC_ENGINE {
       return true;
   }
 
-  // Play SFX on the last (rare used) slot to stop later
-  int StopAllSoundsExt() {
+  int LastSndHandle = 0;
+
+  // Play SFX with returning a handle to stop it
+  int SndHandle_Play() {
+      // Get SFX name
+      zSTRING s;
+      parser->GetParameter(s);
+
       // Get sound to play
-      if (zsound) {
-          zsound->StopAllSounds();
+      zCSoundFX* snd = zsound->LoadSoundFXScript(s);
+      if (snd != NULL) {
+          LastSndHandle = zsound->PlaySound(snd, 0);
+          zRELEASE(snd);
+      };
+
+      return true;
+  }
+
+  // Stop last SFX played with SndHandle_Play
+  int SndHandle_Stop() {
+      if (0 < LastSndHandle) {
+          zsound->StopSound(LastSndHandle);
       };
 
       return true;
@@ -613,7 +630,8 @@ namespace GOTHIC_ENGINE {
 
   void Game_DefineExternals() {
       parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
-      parser->DefineExternal("StopAllSoundsExt", StopAllSoundsExt, zPAR_TYPE_VOID, zPAR_TYPE_VOID);
+      parser->DefineExternal("SndHandle_Play", SndHandle_Play, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_VOID);
+      parser->DefineExternal("SndHandle_Stop", SndHandle_Stop, zPAR_TYPE_VOID, zPAR_TYPE_VOID);
   }
 
   void Game_ApplyOptions() {
