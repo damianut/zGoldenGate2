@@ -462,7 +462,6 @@ namespace GOTHIC_ENGINE {
   }
 
   // Hide focus bar, if it is a boss
-  /*
   HOOK Hook_oCGame_UpdatePlayerStatus PATCH_IF(&oCGame::UpdatePlayerStatus, &oCGame::UpdatePlayerStatus_Union, false);
 
   void oCGame::UpdatePlayerStatus_Union() {
@@ -491,7 +490,6 @@ namespace GOTHIC_ENGINE {
           }
       }
   }
-  */
 
   // Get an item which C_NPC uses to cast a spell
   int Npc_GetActiveSpellSourceItem() {
@@ -509,33 +507,6 @@ namespace GOTHIC_ENGINE {
       return true;
   }
 
-  int LastSndHandle = 0;
-
-  // Play SFX with returning a handle to stop it
-  int SndHandle_Play() {
-      // Get SFX name
-      zSTRING s;
-      parser->GetParameter(s);
-
-      // Get sound to play
-      zCSoundFX* snd = zsound->LoadSoundFXScript(s);
-      if (snd != NULL) {
-          LastSndHandle = zsound->PlaySound(snd, 0);
-          zRELEASE(snd);
-      };
-
-      return true;
-  }
-
-  // Stop last SFX played with SndHandle_Play
-  int SndHandle_Stop() {
-      if (0 < LastSndHandle) {
-          zsound->StopSound(LastSndHandle);
-      };
-
-      return true;
-  }
-
   void EnableHook() {
       Hook_oCAIArrow_CanThisCollideWith.Commit();
       Hook_oCMag_Book_Spell_Cast.Commit();
@@ -545,7 +516,7 @@ namespace GOTHIC_ENGINE {
       Hook_oCNpc_ThinkNextFightAction.Commit();
       Hook_oCNpc_OnDamage_Condition.Commit();
       Hook_oCInformationManager_OnTermination.Commit();
-      // Hook_oCGame_UpdatePlayerStatus.Commit();
+      Hook_oCGame_UpdatePlayerStatus.Commit();
   }
 
   void Game_Entry() {
@@ -590,8 +561,6 @@ namespace GOTHIC_ENGINE {
   }
 
   void LoadEnd() {
-      // Reset SFX handle
-      LastSndHandle = 0;
   }
 
   void Game_LoadBegin_NewGame() {
@@ -632,8 +601,6 @@ namespace GOTHIC_ENGINE {
 
   void Game_DefineExternals() {
       parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
-      parser->DefineExternal("SndHandle_Play", SndHandle_Play, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_VOID);
-      parser->DefineExternal("SndHandle_Stop", SndHandle_Stop, zPAR_TYPE_VOID, zPAR_TYPE_VOID);
   }
 
   void Game_ApplyOptions() {
