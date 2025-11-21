@@ -13,8 +13,33 @@ namespace GOTHIC_ENGINE {
       // oCViewStatusBar
       bossBar = zNEW(oCViewStatusBar());
       screen->InsertItem(bossBar);
-      bossBar->Init(2048, 100, 1.0); // x: 1/4 of full size, y: 100/8192
-      bossBar->SetSize(4096, screen->any(25)); // x: 1/2 of full size: y: 40 px (1,5 of health bar)
+
+      /*
+       *  Size can be defined in Daedalus scripts
+       */
+
+      // BOSSBAR_X
+      int BOSSBAR_X = 0;
+      zCPar_Symbol* sym = parser->GetSymbol("BOSSBAR_X");
+      if (sym) sym->GetValue(BOSSBAR_X, 0);
+
+      // BOSSBAR_Y
+      int BOSSBAR_Y = 0;
+      sym = parser->GetSymbol("BOSSBAR_Y");
+      if (sym) sym->GetValue(BOSSBAR_Y, 0);
+
+      // BOSSBAR_SIZE_X
+      int BOSSBAR_SIZE_X = 0;
+      sym = parser->GetSymbol("BOSSBAR_SIZE_X");
+      if (sym) sym->GetValue(BOSSBAR_SIZE_X, 0);
+
+      // BOSSBAR_SIZE_PX_Y
+      int BOSSBAR_SIZE_PX_Y = 0;
+      sym = parser->GetSymbol("BOSSBAR_SIZE_PX_Y");
+      if (sym) sym->GetValue(BOSSBAR_SIZE_PX_Y, 0);
+
+      bossBar->Init(BOSSBAR_X, BOSSBAR_Y, 1.0); // x: 1/4 of full size, y: 100/8192
+      bossBar->SetSize(BOSSBAR_SIZE_X, screen->any(BOSSBAR_SIZE_PX_Y)); // x: 1/2 of full size: y: 40 px (1,5 of health bar)
       bossBar->SetTextures("BossBar_Back.tga", "", "BAR_health.tga", "");
       bossBar->SetMaxRange(0, 30); // Default, to change while update
 
