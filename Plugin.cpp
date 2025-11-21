@@ -40,7 +40,7 @@ namespace GOTHIC_ENGINE {
 
       bossBar->Init(BOSSBAR_X, BOSSBAR_Y, 1.0); // x: 1/4 of full size, y: 100/8192
       bossBar->SetSize(BOSSBAR_SIZE_X, screen->any(BOSSBAR_SIZE_PX_Y)); // x: 1/2 of full size: y: 40 px (1,5 of health bar)
-      bossBar->SetTextures("BossBar_Back.tga", "", "BAR_health.tga", "");
+      bossBar->SetTextures("BossBar_Back.tga", "", "BossBar_Health.tga", "");
       bossBar->SetMaxRange(0, 30); // Default, to change while update
 
       screen->RemoveItem(bossBar);
