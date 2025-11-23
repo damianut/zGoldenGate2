@@ -531,6 +531,18 @@ namespace GOTHIC_ENGINE {
 
       return true;
   }
+  
+  // Get game time in seconds
+  int Game_GetSeconds() {
+      // Get time
+      int output = gameMan->GetPlaytimeSeconds();
+
+      // Push return value
+      parser->SetReturn(output);
+      
+      return true;
+  }
+  
 
   void EnableHook() {
       Hook_oCAIArrow_CanThisCollideWith.Commit();
@@ -626,6 +638,7 @@ namespace GOTHIC_ENGINE {
 
   void Game_DefineExternals() {
       parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
+      parser->DefineExternal("Game_GetSeconds", Game_GetSeconds, zPAR_TYPE_INT, zPAR_TYPE_VOID);
   }
 
   void Game_ApplyOptions() {
