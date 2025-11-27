@@ -542,6 +542,68 @@ namespace GOTHIC_ENGINE {
       
       return true;
   }
+
+  // Insert a vob on a given position, with a given rotation and collision
+  int SDK_Wld_InsertVob_Pos_Rot_Coll() {
+      // Declare arguments
+      zSTRING vobName;
+      zSTRING vobModel;
+      int posX;
+      int posY;
+      int posZ;
+      int rotX;
+      int rotY;
+      int rotZ;
+      int collDyn;
+      int collStat;
+
+      // Get the values
+      parser->GetParameter(collStat);
+      parser->GetParameter(collDyn);
+      parser->GetParameter(rotZ);
+      parser->GetParameter(rotY);
+      parser->GetParameter(rotX);
+      parser->GetParameter(posZ);
+      parser->GetParameter(posY);
+      parser->GetParameter(posX);
+      parser->GetParameter(vobModel);
+      parser->GetParameter(vobName);
+
+      // Create vob
+      zCVob* vob = new zCVob();
+      ogame->GetGameWorld()->AddVob(vob);
+      vob->SetVisual(vobModel);
+      vob->SetVobName(vobName);
+      vob->SetPhysicsEnabled(TRUE);
+      zVEC3 posXYZ = zVEC3((float)posX, (float)posY, (float)posZ);
+      vob->SetPositionWorld(posXYZ);
+      vob->RotateLocalX((float)rotX);
+      vob->RotateLocalY((float)rotY);
+      vob->RotateLocalZ((float)rotZ);
+      vob->collDetectionDynamic = collDyn;
+      vob->collDetectionStatic = collStat;
+      vob->Release();
+
+      return true;
+  }
+
+  // Remove a vob
+  int SDK_Wld_RemoveVob() {
+      // Declare argument
+      zSTRING vobName;
+
+      // Get a value
+      parser->GetParameter(vobName);
+
+      zCVob* vob = ogame->GetGameWorld()->SearchVobByName(vobName.Upper());
+
+      if (!vob) { return false; }
+
+      ogame->GetGameWorld()->RemoveVob(vob);
+      vob->Release();
+
+      return true;
+  }
   
 
   void EnableHook() {
@@ -639,6 +701,8 @@ namespace GOTHIC_ENGINE {
   void Game_DefineExternals() {
       parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
       parser->DefineExternal("Game_GetSeconds", Game_GetSeconds, zPAR_TYPE_INT, zPAR_TYPE_VOID);
+      parser->DefineExternal("SDK_Wld_InsertVob_Pos_Rot_Coll", SDK_Wld_InsertVob_Pos_Rot_Coll, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_STRING, zPAR_TYPE_INT, zPAR_TYPE_INT, zPAR_TYPE_INT, zPAR_TYPE_INT, zPAR_TYPE_INT, zPAR_TYPE_INT, zPAR_TYPE_INT, zPAR_TYPE_INT, zPAR_TYPE_VOID);
+      parser->DefineExternal("SDK_Wld_RemoveVob", SDK_Wld_RemoveVob, zPAR_TYPE_VOID, zPAR_TYPE_STRING, zPAR_TYPE_VOID);
   }
 
   void Game_ApplyOptions() {
