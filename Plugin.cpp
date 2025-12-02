@@ -437,15 +437,16 @@ namespace GOTHIC_ENGINE {
               GetEM()->OnMessage(att, this);
           }
 
-          
+
 
           return TRUE;
 
-      } else
-      {
-          int returned = THISCALL(Hook_oCNpc_FightAttackMelee)(myMove);
+      }
+ else
+ {
+     int returned = THISCALL(Hook_oCNpc_FightAttackMelee)(myMove);
 
-          return returned;
+     return returned;
       };
   }
 
@@ -514,6 +515,30 @@ namespace GOTHIC_ENGINE {
               }
           }
       }
+  }
+
+  // Disable dubbing on demand
+  HOOK Hook_oCNpc_EV_PlaySound PATCH_IF(&oCNpc::EV_PlaySound, &oCNpc::EV_PlaySound_Union, false);
+  int oCNpc::EV_PlaySound_Union(oCMsgConversation* msg) {
+      // If player not NPC hasn't to have played sound
+      if (this != player && this != oCInformationManager::GetInformationManager().Npc) {
+          return THISCALL(Hook_oCNpc_EV_PlaySound)(msg);
+      }
+
+      // Call default function
+      int result = THISCALL(Hook_oCNpc_EV_PlaySound)(msg);
+
+      // If player disabled dubbing, then stop a sound
+      if (DisableDubbing) {
+          if (zsound->IsSoundActive(msg->handle)) {
+              zsound->StopSound(msg->handle);
+          }
+      }
+
+      return result;
+  }
+  void UpdateDubbingSettings() {
+      DisableDubbing = zoptions->ReadBool("MOD_GOLDENGATE2", "DisableDubbing", DisableDubbing);
   }
 
   // Get an item which C_NPC uses to cast a spell
@@ -616,6 +641,7 @@ namespace GOTHIC_ENGINE {
       Hook_oCNpc_OnDamage_Condition.Commit();
       Hook_oCInformationManager_OnTermination.Commit();
       Hook_oCGame_UpdatePlayerStatus.Commit();
+      Hook_oCNpc_EV_PlaySound.Commit();
   }
 
   void Game_Entry() {
@@ -623,6 +649,7 @@ namespace GOTHIC_ENGINE {
   
   void Game_Init() {
       EnableHook();
+      UpdateDubbingSettings();
   }
 
   void Game_Exit() {
@@ -706,6 +733,7 @@ namespace GOTHIC_ENGINE {
   }
 
   void Game_ApplyOptions() {
+      UpdateDubbingSettings();
   }
 
   /*

@@ -4,4 +4,5 @@
 
 namespace GOTHIC_ENGINE {
   // Add your code here . . .
+	bool DisableDubbing = false;
 }
