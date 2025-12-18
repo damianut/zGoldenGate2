@@ -3,120 +3,6 @@
 #include "resource.h"
 
 namespace GOTHIC_ENGINE {
-  
-  /*
-   *  Show Boss Bar
-   */
-  oCViewStatusBar* bossBar;
-
-  void BossBar_Create() {
-      // oCViewStatusBar
-      bossBar = zNEW(oCViewStatusBar());
-      screen->InsertItem(bossBar);
-
-      /*
-       *  Size can be defined in Daedalus scripts
-       */
-
-      // BOSSBAR_X
-      int BOSSBAR_X = 0;
-      zCPar_Symbol* sym = parser->GetSymbol("BOSSBAR_X");
-      if (sym) sym->GetValue(BOSSBAR_X, 0);
-
-      // BOSSBAR_Y
-      int BOSSBAR_Y = 0;
-      sym = parser->GetSymbol("BOSSBAR_Y");
-      if (sym) sym->GetValue(BOSSBAR_Y, 0);
-
-      // BOSSBAR_SIZE_X
-      int BOSSBAR_SIZE_X = 0;
-      sym = parser->GetSymbol("BOSSBAR_SIZE_X");
-      if (sym) sym->GetValue(BOSSBAR_SIZE_X, 0);
-
-      // BOSSBAR_SIZE_PX_Y
-      int BOSSBAR_SIZE_PX_Y = 0;
-      sym = parser->GetSymbol("BOSSBAR_SIZE_PX_Y");
-      if (sym) sym->GetValue(BOSSBAR_SIZE_PX_Y, 0);
-
-      bossBar->Init(BOSSBAR_X, BOSSBAR_Y, 1.0); // x: 1/4 of full size, y: 100/8192
-      bossBar->SetSize(BOSSBAR_SIZE_X, screen->any(BOSSBAR_SIZE_PX_Y)); // x: 1/2 of full size: y: 40 px (1,5 of health bar)
-      bossBar->SetTextures("BossBar_Back.tga", "", "BossBar_Health.tga", "");
-      bossBar->SetMaxRange(0, 30); // Default, to change while update
-
-      screen->RemoveItem(bossBar);
-  }
-
-  void BossBar_Update() {
-      screen->InsertItem(bossBar);
-
-      // HP
-      int BossBar_HP = 0;
-      zCPar_Symbol* sym = parser->GetSymbol("BossBar_HP");
-      if (sym) sym->GetValue(BossBar_HP, 0);
-
-      // HPMax
-      int BossBar_HPMax = 0;
-      sym = parser->GetSymbol("BossBar_HPMax");
-      if (sym) sym->GetValue(BossBar_HPMax, 0);
-
-      bossBar->SetMaxRange(0, (float)BossBar_HPMax);
-      bossBar->SetRange(0, (float)BossBar_HPMax);
-      bossBar->SetPreview((float)BossBar_HP);
-      bossBar->SetValue((float)BossBar_HP);
-  }
-
-  void BossBar_Hide() {
-      if (bossBar) { screen->RemoveItem(bossBar); };
-  }
-
-  void BossBar_Delete() {
-      if (bossBar) { screen->RemoveItem(bossBar); delete bossBar; bossBar = NULL; };
-  }
-
-  void BossBar_Controller() {
-      // Show only, if player status is displayed
-      if (!ogame->GetShowPlayerStatus())
-      {
-          BossBar_Hide();
-          return;
-      };
-
-      // Show only, player hitpoints bar is created
-      if (!ogame->hpBar) {
-          BossBar_Hide();
-          return;
-      };
-
-      // Show only, if desktop is not toggled
-      if (ogame->pause_screen) {
-          BossBar_Hide();
-          return;
-      };
-
-      // Check should be enabled
-      int BossBar_Enabled = 0;
-      zCPar_Symbol* sym = parser->GetSymbol("BossBar_Enabled");
-      if (sym) sym->GetValue(BossBar_Enabled, 0);
-
-      if (true == BossBar_Enabled)
-      {
-          // Create, if needed
-          if (!bossBar) {
-              BossBar_Create();
-          };
-
-          // Update
-          BossBar_Update();
-          // Delete, if shouldn't be displayed
-      }
-      else
-      {
-          if (bossBar) {
-              BossBar_Delete();
-          };
-      };
-  }
-
   /*
    *  Untrigger on demand
    */
@@ -487,36 +373,6 @@ namespace GOTHIC_ENGINE {
       };
   }
 
-  // Hide focus bar, if it is a boss
-  HOOK Hook_oCGame_UpdatePlayerStatus PATCH_IF(&oCGame::UpdatePlayerStatus, &oCGame::UpdatePlayerStatus_Union, false);
-
-  void oCGame::UpdatePlayerStatus_Union() {
-      THISCALL(Hook_oCGame_UpdatePlayerStatus)();
-
-      // If boss bar is displayed
-      if (bossBar) {
-          // Get player's focus
-          zCVob* focus = oCNpc::player->GetFocusVob();
-          oCNpc* other = NULL;
-
-          // If it is oCNpc
-          if (other = zDYNAMIC_CAST<oCNpc>(focus))
-          {
-              // BossID
-              int BossBar_BossID = 0;
-              zCPar_Symbol* sym = parser->GetSymbol("BossBar_BossID");
-              if (sym) sym->GetValue(BossBar_BossID, 0);
-
-              // If it is a boss
-              if (other->idx == BossBar_BossID)
-              {
-                  // Hide focus bar
-                  screen->RemoveItem(focusBar);
-              }
-          }
-      }
-  }
-
   // Disable dubbing on demand
   HOOK Hook_oCNpc_EV_PlaySound PATCH_IF(&oCNpc::EV_PlaySound, &oCNpc::EV_PlaySound_Union, false);
   int oCNpc::EV_PlaySound_Union(oCMsgConversation* msg) {
@@ -640,7 +496,6 @@ namespace GOTHIC_ENGINE {
       Hook_oCNpc_ThinkNextFightAction.Commit();
       Hook_oCNpc_OnDamage_Condition.Commit();
       Hook_oCInformationManager_OnTermination.Commit();
-      Hook_oCGame_UpdatePlayerStatus.Commit();
       Hook_oCNpc_EV_PlaySound.Commit();
   }
 
@@ -659,9 +514,6 @@ namespace GOTHIC_ENGINE {
   }
 
   void Game_Loop() {
-      // Show Boss Bar
-      BossBar_Controller();
-
       // Untrigger on demand
       UntriggerOnDemand_Controller();
   }
@@ -676,8 +528,6 @@ namespace GOTHIC_ENGINE {
   TSaveLoadGameInfo& SaveLoadGameInfo = UnionCore::SaveLoadGameInfo;
 
   void Game_SaveBegin() {
-      // To not save Boss Bar
-      BossBar_Delete();
   }
 
   void Game_SaveEnd() {

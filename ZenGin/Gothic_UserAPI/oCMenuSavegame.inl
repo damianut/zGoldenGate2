@@ -3,3 +3,4 @@
 // User API for oCMenuSavegame
 // Add your methods here
 
+void ScreenInit_Union( );
