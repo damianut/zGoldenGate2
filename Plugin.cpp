@@ -481,7 +481,6 @@ namespace GOTHIC_ENGINE {
       if (!vob) { return false; }
 
       ogame->GetGameWorld()->RemoveVob(vob);
-      vob->Release();
 
       return true;
   }
