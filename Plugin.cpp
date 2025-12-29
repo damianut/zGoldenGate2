@@ -405,11 +405,13 @@ namespace GOTHIC_ENGINE {
               oCMag_Book* book = instance->GetSpellBook();
               if (book) {
                   oCItem* item = book->GetSpellItem(book->GetSelectedSpellNr());
-                  parser->SetInstance("ITEM", item);
+                  parser->SetReturn(item);
+                  return true;
               }
           }
       }
 
+      parser->SetReturn(nullptr);
       return true;
   }
   
@@ -513,7 +515,7 @@ namespace GOTHIC_ENGINE {
   }
 
   void Game_DefineExternals() {
-      parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
+      parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_INSTANCE);
       parser->DefineExternal("Game_GetSeconds", Game_GetSeconds, zPAR_TYPE_INT, zPAR_TYPE_VOID);
   }
 
