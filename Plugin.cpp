@@ -515,7 +515,7 @@ namespace GOTHIC_ENGINE {
   }
 
   void Game_DefineExternals() {
-      parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_VOID, zPAR_TYPE_INSTANCE, zPAR_TYPE_INSTANCE);
+      parser->DefineExternal("Npc_GetActiveSpellSourceItem", Npc_GetActiveSpellSourceItem, zPAR_TYPE_INSTANCE, zPAR_TYPE_INSTANCE, zPAR_TYPE_VOID);
       parser->DefineExternal("Game_GetSeconds", Game_GetSeconds, zPAR_TYPE_INT, zPAR_TYPE_VOID);
   }
 
