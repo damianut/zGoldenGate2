@@ -348,7 +348,7 @@ namespace GOTHIC_ENGINE {
           // If it is not force by `AIV_DropDeadAndKill = 52`
           if (false == this->aiscriptvars[52])
           {
-              if (true == this->aiscriptvars[98])
+              if (0 < this->aiscriptvars[98])
               {
                   descDamage.bIsDead = false;
                   descDamage.bIsUnconscious = true;
